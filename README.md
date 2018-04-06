@@ -31,8 +31,7 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.
 
 ## Demo
-
-![React Sample - GitHub Card](https://raw.githubusercontent.com/juanru/react-sample-numbers-game/master/public/img/demo-numbers-game.gif)
+Coming soon!
 
 ## Sending Feedback
 
