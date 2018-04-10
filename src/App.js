@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import _ from 'lodash'
 
-import {NUMBERS_COUNT, OPERATIONS_COUNT} from './util/constants/gameConstants'
+import {NUMBERS_COUNT, OPERATIONS_COUNT, MAX_SELECTED_NUMBER} from './util/constants/gameConstants'
 import {ADD, SUBTRACT} from './util/constants/operations'
 
 
@@ -53,7 +53,7 @@ const Body = (props) => {
 const Choices = () => {
     return (
         <div style={{textAlign: 'center'}}>
-            {_.times(9, function (i) {
+            {_.times(MAX_SELECTED_NUMBER, function (i) {
                 return <div className={'numberCircle'}>{i + 1}</div>
             })}
         </div>
@@ -127,7 +127,7 @@ class App extends Component {
     }
 
     getRandomNumber = () => {
-        return _.random(1, 9);
+        return _.random(1, MAX_SELECTED_NUMBER);
     };
 
     getRandomOperation = () => {
