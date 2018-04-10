@@ -6,11 +6,10 @@ import registerServiceWorker from './registerServiceWorker';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import fontawesome from '@fortawesome/fontawesome'
-import brands from '@fortawesome/fontawesome-free-brands';
-import faCheckSquare from '@fortawesome/fontawesome-free-solid/faCheckSquare';
-import faCoffee from '@fortawesome/fontawesome-free-solid/faCoffee';
+import faTimes from '@fortawesome/fontawesome-free-solid/faTimes';
+import faCheck from '@fortawesome/fontawesome-free-solid/faCheck';
 
-fontawesome.library.add(brands, faCheckSquare, faCoffee);
+fontawesome.library.add(faTimes, faCheck);
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();
