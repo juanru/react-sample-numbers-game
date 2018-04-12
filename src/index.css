@@ -18,9 +18,7 @@ body {
 .column.playgroundColumn {
     background: beige;
 }
-
-.numberCircle {
-    background: cadetblue;
+.numberCircle, .operationCircle {
     border-radius: 0.8em;
     -moz-border-radius: 0.8em;
     -webkit-border-radius: 0.8em;
@@ -31,4 +29,12 @@ body {
     margin-right: 15px;
     text-align: center;
     width: 1.6em;
+    height: 1.6em;
+}
+
+.numberCircle {
+    background: cadetblue;
+}
+.operationCircle {
+    color: black;
 }

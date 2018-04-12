@@ -28,6 +28,9 @@ const Body = (props) => {
         goalNumber, answerIsCorrect, checkOperation,
         numbers, operations
     } = props;
+
+    let selectedNumbers = [0, 0];
+
     return (
         <div className="row justify-content-center">
             <div className="col-4 column goalColumn">
@@ -43,7 +46,7 @@ const Body = (props) => {
             <div className="col-4 column playgroundColumn">
                 <div className="row justify-content-center">Math Puzzle:</div>
                 <div style={{textAlign: 'center'}}>
-                    <Ecuation numbers={numbers} operations={operations}/>
+                    <Ecuation selectedNumbers={selectedNumbers} operations={operations}/>
                 </div>
             </div>
         </div>
@@ -54,16 +57,36 @@ const Choices = () => {
     return (
         <div style={{textAlign: 'center'}}>
             {_.times(MAX_SELECTED_NUMBER, function (i) {
-                return <div className={'numberCircle'}>{i + 1}</div>
+                return <div key={i} className={'numberCircle'}>{i + 1}</div>
             })}
         </div>
     );
 };
 
 const Ecuation = (props) => {
-    const {numbers, operations} = props;
+    const {selectedNumbers, operations} = props;
+
+    const printEcuation = (selectedNumbers) => {
+        var indents = [];
+        // Show empty values if no number has been selected yet
+        if (selectedNumbers.length !== NUMBERS_COUNT)
+            selectedNumbers = selectedNumbers.concat(Array.from("?".repeat(NUMBERS_COUNT - selectedNumbers.length)));
+
+        _.forEach(operations, function (operation, i) {
+            indents.push(<span>
+                <span key={i} className={'numberCircle'}>{selectedNumbers[i]}</span>
+                <span key={i} className={'operationCircle'}>{operation}</span>
+            </span>);
+            if (operation.length === i - 1)
+                indents.push(<span key={i + 1} className={'numberCircle'}>{selectedNumbers[i + 1]}</span>);
+        });
+        return indents
+    };
+
     return (
-        <div></div>
+        <div>
+            {printEcuation(selectedNumbers)}
+        </div>
     );
 };
 
