@@ -25,11 +25,8 @@ const Header = () => {
 
 const Body = (props) => {
     const {
-        goalNumber, answerIsCorrect, checkOperation,
-        numbers, operations
+        goalNumber, answerIsCorrect, checkOperation, operations, selectedNumbers
     } = props;
-
-    let selectedNumbers = [0, 0];
 
     return (
         <div className="row justify-content-center">
@@ -37,61 +34,86 @@ const Body = (props) => {
                 <div className="row justify-content-center">Goal number:</div>
                 <h1 style={{textAlign: 'center'}}>{goalNumber}</h1>
             </div>
-            <div className="col-2">
-                <div className="column centeredBox">
-                    <Button answerIsCorrect={answerIsCorrect} checkOperation={checkOperation}/>
+            <div className="col-2 align-middle">
+                <div className="column vcenter">
+                    <Button answerIsCorrect={answerIsCorrect} selectedNumbers={selectedNumbers}
+                            checkOperation={checkOperation}/>
                 </div>
 
             </div>
             <div className="col-4 column playgroundColumn">
                 <div className="row justify-content-center">Math Puzzle:</div>
                 <div style={{textAlign: 'center'}}>
-                    <Ecuation selectedNumbers={selectedNumbers} operations={operations}/>
+                    <Equation selectedNumbers={selectedNumbers} operations={operations}/>
                 </div>
             </div>
         </div>
     );
 };
 
-const Choices = () => {
+const Choice = (props) => {
+    const {index, handleSelectedNumber, selectedNumbers} = props;
+    let choice = null;
+
+    if (selectedNumbers.includes(index + 1)) {
+        choice = <div key={index} onClick={() => handleSelectedNumber(index + 1)}
+                      className={'numberCircle selected'}>{index + 1}</div>;
+    } else {
+        if (selectedNumbers.length === NUMBERS_COUNT) {
+            choice = <div key={index} className={'numberCircle disabled'}>{index + 1}</div>;
+        } else {
+            choice =
+                <div key={index} onClick={() => handleSelectedNumber(index + 1)}
+                     className={'numberCircle'}>{index + 1}</div>;
+        }
+    }
+
     return (
-        <div style={{textAlign: 'center'}}>
+        choice
+    )
+};
+
+const Choices = (props) => {
+    return (
+        <div className={'choices'}>
             {_.times(MAX_SELECTED_NUMBER, function (i) {
-                return <div key={i} className={'numberCircle'}>{i + 1}</div>
+                return <Choice key={i} index={i} {...props}/>
             })}
         </div>
     );
 };
 
-const Ecuation = (props) => {
+const Equation = (props) => {
     const {selectedNumbers, operations} = props;
 
-    const printEcuation = (selectedNumbers) => {
-        var indents = [];
-        // Show empty values if no number has been selected yet
+    const printEquation = (selectedNumbers) => {
+        let indents = [];
+        // Fill in with empty values if no numbers has been selected yet
         if (selectedNumbers.length !== NUMBERS_COUNT)
             selectedNumbers = selectedNumbers.concat(Array.from("?".repeat(NUMBERS_COUNT - selectedNumbers.length)));
 
         _.forEach(operations, function (operation, i) {
-            indents.push(<span>
-                <span key={i} className={'numberCircle'}>{selectedNumbers[i]}</span>
-                <span key={i} className={'operationCircle'}>{operation}</span>
+            indents.push(<span key={i}>
+                <span key={i} className={'numberCircle equation'}><h4>{selectedNumbers[i]}</h4></span>
+                <span key={i + selectedNumbers.length}
+                      className={'operationCircle equation'}><h4>{operation}</h4></span>
             </span>);
             if (operation.length === i - 1)
-                indents.push(<span key={i + 1} className={'numberCircle'}>{selectedNumbers[i + 1]}</span>);
+                indents.push(<span key={i + 1}
+                                   className={'numberCircle equation'}><h4>{selectedNumbers[i + 1]}</h4></span>);
         });
         return indents
     };
 
     return (
         <div>
-            {printEcuation(selectedNumbers)}
+            {printEquation(selectedNumbers)}
         </div>
     );
 };
 
 const Button = (props) => {
-    const {answerIsCorrect, checkOperation} = props;
+    const {answerIsCorrect, checkOperation, selectedNumbers} = props;
     let button;
     if (answerIsCorrect) {
         button =
@@ -102,7 +124,7 @@ const Button = (props) => {
     } else if (answerIsCorrect == null) {
         button =
             <button onClick={checkOperation}
-                    className={'btn btn-lg'}> =
+                    className={'btn btn-lg'} disabled={selectedNumbers.length !== NUMBERS_COUNT}> =
             </button>
     } else {
         button =
@@ -122,7 +144,7 @@ const Game = (props) => {
         <div className="container">
             <Header/>
             <Body {...props}/>
-            <Choices/>
+            <Choices handleSelectedNumber={props.handleSelectedNumber} selectedNumbers={props.selectedNumbers}/>
         </div>
     );
 };
@@ -130,7 +152,6 @@ const Game = (props) => {
 class App extends Component {
     state = {
         goalNumber: null,
-        numbers: [],
         operations: [],
         selectedNumbers: [],
         answerIsCorrect: null
@@ -160,7 +181,6 @@ class App extends Component {
     initGoalNumber = () => {
         this.setState({
             goalNumber: this.resolveOperation(this.numbers, this.operations),
-            numbers: this.numbers,
             operations: this.operations
         });
     };
@@ -180,16 +200,37 @@ class App extends Component {
         return result
     };
 
-    checkOperation = () => {
+    handleSelectedNumber = (selectedNumber) => {
+        (this.state.selectedNumbers.includes(selectedNumber)) ?
+            this.removeNumber(selectedNumber) :
+            this.addNumber(selectedNumber)
+    };
 
+    addNumber = (selectedNumber) => {
+        this.setState(prevState => ({
+            selectedNumbers: [...prevState.selectedNumbers, selectedNumber]
+        }));
+    };
+    removeNumber = (selectedNumber) => {
+        this.setState(prevState => ({
+            selectedNumbers: prevState.selectedNumbers.filter(i => i !== selectedNumber)
+        }));
+    };
+
+    checkOperation = () => {
+        (this.resolveOperation(this.state.selectedNumbers, this.state.operations) === this.state.goalNumber) ?
+            this.setState({answerIsCorrect: true}) :
+            this.setState({answerIsCorrect: false})
+        ;
     };
 
     render() {
         return (
             <Game goalNumber={this.state.goalNumber} checkOperation={this.checkOperation}
                   answerIsCorrect={this.state.answerIsCorrect}
-                  numbers={this.state.numbers}
-                  operations={this.state.operations}/>
+                  operations={this.state.operations}
+                  selectedNumbers={this.state.selectedNumbers}
+                  handleSelectedNumber={this.handleSelectedNumber}/>
         );
     }
 }
