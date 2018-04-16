@@ -77,12 +77,12 @@ const Choice = (props) => {
 
     let notCheckedYet = answerIsCorrect === null;
     let numberIsSelected = selectedNumbers.includes(index + 1);
-    let maxNumbersSelected = selectedNumbers.length === NUMBERS_COUNT;
+    let maxNumbersReached = selectedNumbers.length === NUMBERS_COUNT;
 
     // If operation has been checked, the numbers are frozen
     // Before checking the operation, the player can select numbers until the MAX_NUMBER is reached
-    // Selected numbers can be unselected
-    let canClick = notCheckedYet && (!maxNumbersSelected || numberIsSelected);
+    //      Selected numbers can be unselected
+    let canClick = notCheckedYet && (!maxNumbersReached || numberIsSelected);
 
     let choice = null;
 
