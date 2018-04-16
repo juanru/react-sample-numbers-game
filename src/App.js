@@ -3,29 +3,47 @@ import React, {Component} from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import _ from 'lodash'
 
-import {NUMBERS_COUNT, OPERATIONS_COUNT, MAX_SELECTED_NUMBER} from './util/constants/gameConstants'
+import {NUMBER_LIVES, NUMBERS_COUNT, OPERATIONS_COUNT, MAX_SELECTED_NUMBER} from './util/constants/gameConstants'
 import {ADD, SUBTRACT} from './util/constants/operations'
 
 
-const Lives = () => {
+const Lives = (props) => {
+    const {remainingLives} = props;
     return (
-        <div className="row">
+        <div className="row justify-content-center">
             <div className="col-4">&nbsp;</div>
-            <div className="col-4">&nbsp;</div>
-            <div className="col-4">Remaining lives:</div>
+            <div className="col-2">&nbsp;</div>
+            <div className="col-4" style={{textAlign: 'right'}}>Remaining lives: <b>{remainingLives}</b></div>
         </div>
     );
 };
 
-const Header = () => {
+const Header = (props) => {
+    const {remainingLives, answerIsCorrect} = props;
     return (
-        <Lives/>
+        <div>
+            {answerIsCorrect === false &&
+            <div className="alert alert-warning" role="alert">
+                {remainingLives === 0 ? 'Game over dude!' : 'Ooops! Not the right answer. Try a new game.'}
+            </div>
+            }
+            {answerIsCorrect === true &&
+            <div className="alert alert-success" role="alert">
+                <h4 className="alert-heading">Well done!</h4>
+                <p>Aww yeah, you successfully won the game!</p>
+                <hr/>
+                <p className="mb-0">Click on the "Redo" button and play it again :)</p>
+            </div>
+            }
+
+            <Lives remainingLives={props.remainingLives}/>
+        </div>
     );
 };
 
 const Body = (props) => {
     const {
-        goalNumber, answerIsCorrect, checkOperation, operations, selectedNumbers
+        goalNumber, answerIsCorrect, checkOperation, operations, selectedNumbers, remainingLives, resetGame
     } = props;
 
     return (
@@ -35,9 +53,12 @@ const Body = (props) => {
                 <h1 style={{textAlign: 'center'}}>{goalNumber}</h1>
             </div>
             <div className="col-2 align-middle">
-                <div className="column vcenter">
-                    <Button answerIsCorrect={answerIsCorrect} selectedNumbers={selectedNumbers}
-                            checkOperation={checkOperation}/>
+                <div className="column vcenter hcenter">
+                    <CheckButton answerIsCorrect={answerIsCorrect} selectedNumbers={selectedNumbers}
+                                 checkOperation={checkOperation}/>
+                    {remainingLives > 0 && answerIsCorrect !== null &&
+                    <RetryButton resetGame={resetGame}/>
+                    }
                 </div>
 
             </div>
@@ -52,20 +73,24 @@ const Body = (props) => {
 };
 
 const Choice = (props) => {
-    const {index, handleSelectedNumber, selectedNumbers} = props;
+    const {index, handleSelectedNumber, selectedNumbers, answerIsCorrect} = props;
+
+    let notCheckedYet = answerIsCorrect === null;
+    let numberIsSelected = selectedNumbers.includes(index + 1);
+    let maxNumbersSelected = selectedNumbers.length === NUMBERS_COUNT;
+
+    // If operation has been checked, the numbers are frozen
+    // Before checking the operation, the player can select numbers until the MAX_NUMBER is reached
+    // Selected numbers can be unselected
+    let canClick = notCheckedYet && (!maxNumbersSelected || numberIsSelected);
+
     let choice = null;
 
-    if (selectedNumbers.includes(index + 1)) {
+    if (canClick) {
         choice = <div key={index} onClick={() => handleSelectedNumber(index + 1)}
-                      className={'numberCircle selected'}>{index + 1}</div>;
+                      className={`numberCircle ${numberIsSelected ? 'selected' : ''}`}>{index + 1}</div>;
     } else {
-        if (selectedNumbers.length === NUMBERS_COUNT) {
-            choice = <div key={index} className={'numberCircle disabled'}>{index + 1}</div>;
-        } else {
-            choice =
-                <div key={index} onClick={() => handleSelectedNumber(index + 1)}
-                     className={'numberCircle'}>{index + 1}</div>;
-        }
+        choice = <div key={index} className={`numberCircle disabled ${numberIsSelected ? 'selected' : ''}`}>{index + 1}</div>;
     }
 
     return (
@@ -112,7 +137,16 @@ const Equation = (props) => {
     );
 };
 
-const Button = (props) => {
+const RetryButton = (props) => {
+    return (
+        <button
+            className={'btn btn-lg btn-warning'} style={{marginTop: '5px'}} onClick={props.resetGame}>
+            <FontAwesomeIcon icon="redo"/>
+        </button>
+    );
+};
+
+const CheckButton = (props) => {
     const {answerIsCorrect, checkOperation, selectedNumbers} = props;
     let button;
     if (answerIsCorrect) {
@@ -142,9 +176,10 @@ const Button = (props) => {
 const Game = (props) => {
     return (
         <div className="container">
-            <Header/>
+            <Header remainingLives={props.remainingLives} answerIsCorrect={props.answerIsCorrect}/>
             <Body {...props}/>
-            <Choices handleSelectedNumber={props.handleSelectedNumber} selectedNumbers={props.selectedNumbers}/>
+            <Choices handleSelectedNumber={props.handleSelectedNumber} selectedNumbers={props.selectedNumbers}
+                     answerIsCorrect={props.answerIsCorrect}/>
         </div>
     );
 };
@@ -154,6 +189,7 @@ class App extends Component {
         goalNumber: null,
         operations: [],
         selectedNumbers: [],
+        remainingLives: NUMBER_LIVES,
         answerIsCorrect: null
     };
 
@@ -162,12 +198,10 @@ class App extends Component {
         this.possibleOperations = [
             ADD, SUBTRACT
         ];
-        this.operations = _.times(OPERATIONS_COUNT, this.getRandomOperation);
-        this.numbers = _.times(NUMBERS_COUNT, this.getRandomNumber)
     }
 
     componentDidMount() {
-        this.initGoalNumber();
+        this.resetGame();
     }
 
     getRandomNumber = () => {
@@ -183,6 +217,13 @@ class App extends Component {
             goalNumber: this.resolveOperation(this.numbers, this.operations),
             operations: this.operations
         });
+    };
+
+    resetGame = () => {
+        this.operations = _.times(OPERATIONS_COUNT, this.getRandomOperation);
+        this.numbers = _.times(NUMBERS_COUNT, this.getRandomNumber);
+        this.initGoalNumber();
+        this.setState({answerIsCorrect: null, selectedNumbers: []});
     };
 
     resolveOperation = (numbers, operations) => {
@@ -220,7 +261,7 @@ class App extends Component {
     checkOperation = () => {
         (this.resolveOperation(this.state.selectedNumbers, this.state.operations) === this.state.goalNumber) ?
             this.setState({answerIsCorrect: true}) :
-            this.setState({answerIsCorrect: false})
+            this.setState(prevState => ({answerIsCorrect: false, remainingLives: prevState.remainingLives - 1}))
         ;
     };
 
@@ -230,7 +271,9 @@ class App extends Component {
                   answerIsCorrect={this.state.answerIsCorrect}
                   operations={this.state.operations}
                   selectedNumbers={this.state.selectedNumbers}
-                  handleSelectedNumber={this.handleSelectedNumber}/>
+                  handleSelectedNumber={this.handleSelectedNumber}
+                  remainingLives={this.state.remainingLives}
+                  resetGame={this.resetGame}/>
         );
     }
 }

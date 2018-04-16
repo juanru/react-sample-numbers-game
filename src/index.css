@@ -4,6 +4,10 @@ body {
     font-family: sans-serif;
 }
 
+.container {
+    margin-top: 1em;
+}
+
 .column.vcenter {
     position: absolute;
     margin: 0;
@@ -12,7 +16,7 @@ body {
     left:50%;
     transform: translate(-50%,-50%);
 }
-.centeredBox {
+.hcenter {
     text-align: center;
 }
 
