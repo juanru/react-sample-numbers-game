@@ -11,7 +11,7 @@ const Lives = (props) => {
             <div className="col-2">&nbsp;</div>
             <div className="col-4" style={{textAlign: 'right'}}>Remaining lives:&nbsp;
                 {_.times(remainingLives, function (i) {
-                    return <FontAwesomeIcon icon="heart" className={'remainingLive'}/>
+                    return <FontAwesomeIcon key={i} icon="heart" className={'remainingLive'}/>
                 })}
             </div>
         </div>
