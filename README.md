@@ -5,7 +5,6 @@ Simple react game with following requirements:
 * Selected numbers can be unselected as long as the "check" button is not pressed
 * The game starts with 4 lives and by failed results, the lives will be discounted
 * If there are no lives remaining the game is over
-
 ## Setup
 
 Run `npm install`
