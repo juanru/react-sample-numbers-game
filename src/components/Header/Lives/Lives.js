@@ -6,14 +6,10 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 const Lives = (props) => {
     const {remainingLives} = props;
     return (
-        <div className="row justify-content-center">
-            <div className="col-4">&nbsp;</div>
-            <div className="col-2">&nbsp;</div>
-            <div className="col-4" style={{textAlign: 'right'}}>Remaining lives:&nbsp;
-                {_.times(remainingLives, function (i) {
-                    return <FontAwesomeIcon key={i} icon="heart" className={'remainingLive'}/>
-                })}
-            </div>
+        <div>Remaining lives:&nbsp;
+            {_.times(remainingLives, function (i) {
+                return <FontAwesomeIcon key={i} icon="heart" className={'remainingLive'}/>
+            })}
         </div>
     );
 };
