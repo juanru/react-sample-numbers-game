@@ -1,5 +1,10 @@
 Simple react game with following requirements:
-* ...
+* The user needs to solve a randomly generated Math puzzle to win the game
+* There is a goal number that need to be matched based on addition and subtraction operations
+* The user needs to select 4 numbers to be able to resolve the puzzle
+* Selected numbers can be unselected as long as the "check" button is not pressed
+* The game starts with 4 lives and by failed results, the lives will be discounted
+* If there are no lives remaining the game is over
 
 ## Setup
 
