@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import _ from 'lodash'
 
-import {NUMBER_LIVES, NUMBERS_COUNT, OPERATIONS_COUNT, MAX_SELECTED_NUMBER} from './../util/constants/gameConstants'
-import {ADD, SUBTRACT} from './../util/constants/operations'
+import {NUMBER_LIVES, NUMBERS_COUNT, OPERATIONS_COUNT} from './../util/constants/gameConstants'
+import {resolveOperation, getRandomNumber, getRandomOperation} from './../util/mathUtils'
 
 import Game from './Game';
 
@@ -15,52 +15,23 @@ class App extends Component {
         answerIsCorrect: null
     };
 
-    constructor(props) {
-        super(props);
-        this.possibleOperations = [
-            ADD, SUBTRACT
-        ];
-    }
-
     componentDidMount() {
         this.resetGame();
     }
 
-    getRandomNumber = () => {
-        return _.random(1, MAX_SELECTED_NUMBER);
-    };
-
-    getRandomOperation = () => {
-        return this.possibleOperations[_.random(0, this.possibleOperations.length - 1)];
+    resetGame = () => {
+        this.operations = _.times(OPERATIONS_COUNT, getRandomOperation);
+        this.numbers = _.times(NUMBERS_COUNT, getRandomNumber);
+        this.initGoalNumber();
     };
 
     initGoalNumber = () => {
         this.setState({
-            goalNumber: this.resolveOperation(this.numbers, this.operations),
-            operations: this.operations
+            goalNumber: resolveOperation(this.numbers, this.operations),
+            operations: this.operations,
+            answerIsCorrect: null,
+            selectedNumbers: []
         });
-    };
-
-    resetGame = () => {
-        this.operations = _.times(OPERATIONS_COUNT, this.getRandomOperation);
-        this.numbers = _.times(NUMBERS_COUNT, this.getRandomNumber);
-        this.initGoalNumber();
-        this.setState({answerIsCorrect: null, selectedNumbers: []});
-    };
-
-    resolveOperation = (numbers, operations) => {
-        let result = numbers[0];
-        _.forEach(operations, function (operation, i) {
-            switch (operation) {
-                case SUBTRACT:
-                    result = _.subtract(result, numbers[i + 1]);
-                    break;
-                case ADD:
-                default:
-                    result = _.add(result, numbers[i + 1])
-            }
-        });
-        return result
     };
 
     handleSelectedNumber = (selectedNumber) => {
@@ -80,8 +51,12 @@ class App extends Component {
         }));
     };
 
+    operationIsCorrect = (selectedNumbers, operations, goalNumber) => {
+        return this.resolveOperation(selectedNumbers, operations) === goalNumber
+    };
+
     checkOperation = () => {
-        (this.resolveOperation(this.state.selectedNumbers, this.state.operations) === this.state.goalNumber) ?
+        (this.operationIsCorrect(this.state.selectedNumbers, this.state.operations, this.state.goalNumber)) ?
             this.setState({answerIsCorrect: true}) :
             this.setState(prevState => ({answerIsCorrect: false, remainingLives: prevState.remainingLives - 1}))
         ;
