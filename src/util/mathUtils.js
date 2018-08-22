@@ -7,7 +7,11 @@ export const possibleOperations = [
 ];
 
 export const getRandomNumber = () => {
-    return _.random(1, MAX_SELECTED_NUMBER);
+    return getRandomNumberInRange(1, MAX_SELECTED_NUMBER);
+};
+
+export const getRandomNumberInRange = (minValue, maxValue) => {
+    return _.random(minValue, maxValue);
 };
 
 export const getRandomOperation = () => {
